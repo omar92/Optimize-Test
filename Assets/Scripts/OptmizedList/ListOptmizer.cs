@@ -16,23 +16,21 @@ public class ListOptmizer : MonoBehaviour
     [SerializeField] private RectTransform content;
     [SerializeField] private Scrollbar scrollbarVertical;
     [Tooltip(tooltip: "Maximum number of inistances at the same time.")]
-    [SerializeField] private int maxInistances;
 
-    [SerializeField] private int startIndex = 0;
-    [SerializeField] private int endIndex = 0;
     private RectTransform rearFiller;
     private RectTransform frontFiller;
-
-    [SerializeField] float ItemHeight = 0;
-    [SerializeField] float itemsSpacing = 0;
-    [SerializeField] float ViewportHeight = 0;
-    [SerializeField] int VisibleItemsNumber = 0;
-    [SerializeField] float ContentHeight = 0;
+    private int startIndex = 0;
+    private int endIndex = 0;
+    float ItemHeight = 0;
+    float itemsSpacing = 0;
+    float ViewportHeight = 0;
+    int VisibleItemsNumber = 0;
+    int totallItemsNumber = 0;
+    float ContentHeight = 0;
+    float itemHeighPercintage = 0;
 
     List<GameObject> visbleItems;
     #endregion
-
-
 
 
     #region MonoBehaviour
@@ -55,17 +53,30 @@ public class ListOptmizer : MonoBehaviour
 
     public void PopulateList(int itemsNumber, Action<int> OnItemPopulate)
     {
+        this.totallItemsNumber = itemsNumber;
         ClearOldItems();
-        CalculateMeasures(itemsNumber);
+        CalculateMeasures();
         CreateVisibleItems();
         CreateFillers();
         startIndex = 0;
         endIndex = VisibleItemsNumber - 1;
-        ResizePanels(itemsNumber);
-
+        ResizePanels();
+        scrollbarVertical.onValueChanged.AddListener(OnScrollValueChanged);
     }
 
-    private void ResizePanels(int totallItemsNumber)
+    private void OnScrollValueChanged(float value)
+    {
+        startIndex = Mathf.FloorToInt((100 - value * 100) / itemHeighPercintage);
+        endIndex = startIndex + VisibleItemsNumber - 1;
+        if (endIndex > totallItemsNumber)
+        {
+            startIndex = totallItemsNumber - VisibleItemsNumber;
+            endIndex = totallItemsNumber;
+        }
+        ResizePanels();
+    }
+
+    private void ResizePanels()
     {
         var rect = rearFiller.rect;
         var height = startIndex * (ItemHeight + itemsSpacing) - itemsSpacing; //the space before the visble items
@@ -74,6 +85,8 @@ public class ListOptmizer : MonoBehaviour
         rect = frontFiller.rect;
         height = (totallItemsNumber - endIndex) * (ItemHeight + itemsSpacing) - itemsSpacing; //the space after the visble items
         frontFiller.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, height);
+
+        LayoutRebuilder.ForceRebuildLayoutImmediate(content.GetComponent<RectTransform>());
     }
 
     #endregion
@@ -104,7 +117,7 @@ public class ListOptmizer : MonoBehaviour
         }
     }
 
-    private void CalculateMeasures(int totallItemsNumber)
+    private void CalculateMeasures()
     {
         ItemHeight = ItemTemplate.GetComponent<RectTransform>().rect.height;
 
@@ -119,6 +132,10 @@ public class ListOptmizer : MonoBehaviour
         VisibleItemsNumber = (int)(ViewportHeight / (ItemHeight + itemsSpacing));
 
         ContentHeight = totallItemsNumber * (ItemHeight + itemsSpacing) - itemsSpacing;
+
+        itemHeighPercintage = (100 * ItemHeight) / (ContentHeight - (ItemHeight * VisibleItemsNumber));
+
+        VisibleItemsNumber += 2;
     }
 
     private void CreateVisibleItems()
@@ -127,7 +144,7 @@ public class ListOptmizer : MonoBehaviour
         ItemTemplate.SetActive(true);
         for (int i = 0; i < VisibleItemsNumber; i++)
         {
-            visbleItems.Add(GameObject.Instantiate(ItemTemplate,content));
+            visbleItems.Add(GameObject.Instantiate(ItemTemplate, content));
         }
         ItemTemplate.SetActive(false);
     }
