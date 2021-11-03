@@ -108,16 +108,53 @@ public class ListOptmizer : MonoBehaviour
         ReSortItems();
         oldStartIndex = startIndex;
     }
+
     private void ReSortItems()
     {
-        if (startIndex != oldStartIndex)//1>0
+        if (startIndex > oldStartIndex)//1>0
         {
             for (int i = 0; i < activeItems.Count; i++)
             {
-                activeItems[i].index = startIndex + i;
-                this.OnItemPopulate(activeItems[i].index, activeItems[i].item);
+                if (activeItems[i].index < startIndex)//0<1
+                {
+                    activeItems[i].index = startIndex + VisibleItemsNumber - 1 - i;
+
+                    this.OnItemPopulate(activeItems[i].index, activeItems[i].item);
+                }
+                MoveToEndOfItems(activeItems[i].item);
             }
         }
+        else if (startIndex < oldStartIndex)
+        {
+            var oldENd = oldStartIndex + VisibleItemsNumber;
+            for (int i = activeItems.Count - 1; i >= 0; i--)
+            {
+                if (activeItems[i].index > endIndex)
+                {
+                    activeItems[i].index = startIndex + i;
+
+                    this.OnItemPopulate(activeItems[i].index, activeItems[i].item);
+                }
+                MoveToStartOfItems(activeItems[i].item);
+            }
+        }
+
+        activeItems.Sort((item1, item2) =>
+        {
+            return (item1.index - item2.index);
+        });
+    }
+
+    private void MoveToStartOfItems(GameObject item)
+    {
+        item.transform.SetAsFirstSibling();
+        rearFiller.SetAsFirstSibling();
+    }
+
+    private void MoveToEndOfItems(GameObject item)
+    {
+        item.transform.SetAsLastSibling();
+        frontFiller.SetAsLastSibling();
     }
 
     private void UpdateStartAndEnd(float value)
