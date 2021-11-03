@@ -124,7 +124,12 @@ public class ListOptmizer : MonoBehaviour
     {
         startIndex = Mathf.FloorToInt((100 - value * 100) / itemHeighPercintage);
         endIndex = startIndex + VisibleItemsNumber - 1;
-        if (endIndex > totallItemsNumber)
+        if (startIndex <0)
+        {
+            startIndex = 0;
+            endIndex = VisibleItemsNumber;
+        }
+        if (endIndex >= totallItemsNumber)
         {
             startIndex = totallItemsNumber - VisibleItemsNumber;
             endIndex = totallItemsNumber;
