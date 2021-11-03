@@ -30,23 +30,24 @@ public class InventoryManager : MonoBehaviour
     {
         ItemDatas = GenerateItemDatas(ItemJson, ItemGenerateScale);
 
-        // Instantiate items in the Scroll View.
+        // populate items in the Scroll View with correct data.
         InvintoryList.PopulateList(ItemDatas.Length, (i, item) =>
         {
             var inventoryItem = item.GetComponent<InventoryItem>();
             inventoryItem.Icon.sprite = Icons[ItemDatas[i].IconIndex];
             inventoryItem.Name.text = ItemDatas[i].Name;
-            inventoryItem.Button.onClick.AddListener(() => { SelectInventoryItem(i, ItemDatas[i]); });
+            inventoryItem.Button.onClick.AddListener(() => { SelectInventoryItem(i); });
 
-            if (i == selectedItemIndex)
+            if (i == selectedItemIndex)//set selected if it was the last selected item
             {
-                SetClicked(inventoryItem,true);
+                inventoryItem.SetClicked(true);
             }
-        }, (i, item) =>
+
+        }, (i, item) =>//reset the item to defult state so it can be used again for another item
         {
             var inventoryItem = item.GetComponent<InventoryItem>();
             inventoryItem.Button.onClick.RemoveAllListeners();
-            SetClicked(inventoryItem, false);
+            inventoryItem.SetClicked(false);
         });
     }
 
@@ -71,26 +72,29 @@ public class InventoryManager : MonoBehaviour
         return finalItemDatas;
     }
 
-    private void SelectInventoryItem(int index, InventoryItemData itemData)
+
+    /// <summary>
+    /// select item from inventory acording to index.
+    /// </summary>
+    /// <param name="index">the item index from the data.</param>
+    private void SelectInventoryItem(int index)
     {
         InvintoryList.ForEachVisible((i, item) =>
         {
             if (i == selectedItemIndex)
             {
-                var inventoryItem = item.GetComponent<InventoryItem>();
-                SetClicked(inventoryItem, false);
+                var inventoryItem = item.GetComponent<InventoryItem>();//used GetComponent inside if to reduce the search operations
+                inventoryItem.SetClicked(false);
+
             }
-            if (i == index)
+            else if (i == index)
             {
-                var inventoryItem = item.GetComponent<InventoryItem>();
-                SetClicked(inventoryItem, true);
+                var inventoryItem = item.GetComponent<InventoryItem>();//used GetComponent inside if to reduce the search operations
+                inventoryItem.SetClicked(true);
             }
         });
         selectedItemIndex = index;
     }
 
-    private static void SetClicked(InventoryItem inventoryItem, bool isClicked)
-    {
-        inventoryItem.Background.color = isClicked ? Color.red : Color.white;
-    }
+
 }
