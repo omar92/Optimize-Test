@@ -1,42 +1,49 @@
 using System;
-using System.Collections.Generic;
 using UnityEngine;
+using ScriptableSystem;
 
 public class InventoryManager : MonoBehaviour
 {
-    [Tooltip(tooltip: "Refrence to the list optmizer tool.")]
-    public ListOptmizer InvintoryList;
 
+    [Header("data settings")]
     [Tooltip(tooltip: "Loads the list using this format.")]
     [Multiline]
-    public string ItemJson;
+    [SerializeField] private string ItemJson;
 
     [Tooltip(tooltip: "This is used in generating the items list. The number of additional copies to concat the list parsed from ItemJson.")]
-    public int ItemGenerateScale = 10;
+    [SerializeField] private int ItemGenerateScale = 10;
 
     [Tooltip(tooltip: "Icons referenced by ItemData.IconIndex when instantiating new items.")]
-    public Sprite[] Icons;
+    [SerializeField] private Sprite[] Icons;
+
+    [Header("So variables")]
+    [Tooltip(tooltip: "SO to contain the parsed data.")]
+    [SerializeField] private InventoryItemsDataSO ItemDatas;
+    [Tooltip(tooltip: "SO Indicate current selected item.")]
+    [SerializeField] private IntSO selectedItemIndex;
+
+
+    [Header("So Events")]
+    [Tooltip(tooltip: "Event to indicate data is ready.")]
+    [SerializeField] private EventSO OnDataIsReady;
 
     [Serializable]
     private class InventoryItemDatas
     {
         public InventoryItemData[] ItemDatas;
     }
-    private InventoryItemData[] ItemDatas;
 
-    private int selectedItemIndex = 0;
 
     void Start()
     {
-        ItemDatas = GenerateItemDatas(ItemJson, ItemGenerateScale);
+        InitData();
+    }
 
-        // populate items in the Scroll View with correct data.
-        InvintoryList.PopulateList(ItemDatas.Length, (i, item) =>
-        {
-            item.name = $"{i}:{ItemDatas[i].Name}";
-            var inventoryItem = item.GetComponent<InventoryItem>();
-            inventoryItem.SetData(i, ItemDatas[i], Icons[ItemDatas[i].IconIndex]);
-        });
+    private void InitData()
+    {
+        ItemDatas.Value = GenerateItemDatas(ItemJson, ItemGenerateScale);
+        selectedItemIndex.Value = 0; 
+        OnDataIsReady.Raise();
     }
 
     /// <summary>
@@ -51,6 +58,7 @@ public class InventoryManager : MonoBehaviour
         var finalItemDatas = new InventoryItemData[itemDatas.Length * scale];
         for (var i = 0; i < itemDatas.Length; i++)
         {
+            itemDatas[i].sprite = Icons[itemDatas[i].IconIndex];
             for (var j = 0; j < scale; j++)
             {
                 finalItemDatas[i + j * itemDatas.Length] = itemDatas[i];

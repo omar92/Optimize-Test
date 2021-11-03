@@ -14,15 +14,13 @@ public class InventoryItem : MonoBehaviour
 
     [Header("So Variables")]
     [SerializeField] private IntSO selectedItemIndex;
-    [SerializeField] private InventoryItemDataSO currentInventoryItemData;
-    [SerializeField] private SpriteSO currentSprite;
+    [SerializeField] private InventoryItemsDataSO inventoryItemsData;
 
     [Header("So Events")]
     [SerializeField] private EventSO OnItemsSeleccted;
 
     private int index;
     private bool isClicked;
-    private InventoryItemData inventoryItemData;
 
     private void Start()
     {
@@ -39,11 +37,11 @@ public class InventoryItem : MonoBehaviour
     /// <param name="index">The item order.</param>
     /// <param name="inventoryItemData">the Item Data.</param>
     /// <param name="sprite">the Item sprite.</param>
-    public void SetData(int index, InventoryItemData inventoryItemData, Sprite sprite)
+    public void SetData(int index)
     {
         this.index = index;
-        Icon.sprite = sprite;
-        Name.text = inventoryItemData.Name;
+        Icon.sprite = inventoryItemsData.Value[index].sprite;
+        Name.text = inventoryItemsData.Value[index].Name;
         SetClicked(index == selectedItemIndex.Value);
     }
 
@@ -76,8 +74,6 @@ public class InventoryItem : MonoBehaviour
     private void OnClick()
     {
         selectedItemIndex.Value = index;
-        currentInventoryItemData.Value = inventoryItemData;
-        currentSprite.Value = Icon.sprite;
         OnItemsSeleccted.Raise();
     }
 }

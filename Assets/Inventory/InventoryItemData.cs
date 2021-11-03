@@ -1,11 +1,12 @@
 using System;
-
+using UnityEngine;
 
 [Serializable]
-public class InventoryItemData {
+public struct InventoryItemData {
     
     public int IconIndex;
     public string Name;
     public string Description;
     public int Stat;
+    public Sprite sprite;
 }
