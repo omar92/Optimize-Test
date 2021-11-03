@@ -121,8 +121,8 @@ public class ListOptmizer : MonoBehaviour
         {
             for (int i = 0; i < activeItems.Count; i++)
             {
-                activeItems[i].index = startIndex + i;
                 this.OnItemHide(activeItems[i].index, activeItems[i].item);
+                activeItems[i].index = startIndex + i;
                 this.OnItemShow(activeItems[i].index, activeItems[i].item);
             }
         }
