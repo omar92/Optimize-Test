@@ -29,12 +29,13 @@ public class ListOptmizer : MonoBehaviour
     int totallItemsNumber = 0;
     float ContentHeight = 0;
     float itemHeighPercintage = 0;
-    Action<int, GameObject> OnItemPopulate;
+    Action<int, GameObject> OnItemShow;
+    Action<int, GameObject> OnItemHide;
 
-   public List<ItemIndexPair> activeItems;
+    List<ItemIndexPair> activeItems;
 
 
-    public class ItemIndexPair
+    class ItemIndexPair
     {
         public ItemIndexPair(int index, GameObject gameobject)
         {
@@ -44,43 +45,40 @@ public class ListOptmizer : MonoBehaviour
         public int index;
         public GameObject item;
     }
-
-
     #endregion
 
 
-    #region MonoBehaviour
+    //#region MonoBehaviour
 
-    private void Awake()
-    {
-    }
+    //private void Awake()
+    //{
+    //}
 
-    void Start()
-    {
-        PopulateList(100, (i, gameObject) =>
-        {
-            gameObject.name = ItemTemplate.name + ":" + i;
-            var text = gameObject.GetComponentInChildren<TMPro.TMP_Text>();
-            if (text)
-            {
-                text.text = "" + i;
-            }
-            else
-            {
-                Debug.Log($"cant find TMP_Text of {i}");
-            }
+    //void Start()
+    //{
+    //    PopulateList(100, (i, gameObject) =>
+    //    {
+    //        gameObject.name = ItemTemplate.name + ":" + i;
+    //        var text = gameObject.GetComponentInChildren<TMPro.TMP_Text>();
+    //        if (text)
+    //        {
+    //            text.text = "" + i;
+    //        }
+    //        else
+    //        {
+    //            Debug.Log($"cant find TMP_Text of {i}");
+    //        }
 
-        });
-    }
-    #endregion
+    //    });
+    //}
+    //#endregion
 
     #region methods
-
-
-    public void PopulateList(int itemsNumber, Action<int, GameObject> OnItemPopulate)
+    public void PopulateList(int itemsNumber, Action<int, GameObject> OnItemShow, Action<int, GameObject> OnItemHide)
     {
         this.totallItemsNumber = itemsNumber;
-        this.OnItemPopulate = OnItemPopulate;
+        this.OnItemShow = OnItemShow;
+        this.OnItemHide = OnItemHide;
         ClearOldItems();
         CalculateMeasures();
         CreateVisibleItems();
@@ -92,12 +90,21 @@ public class ListOptmizer : MonoBehaviour
         scrollbarVertical.onValueChanged.AddListener(OnScrollValueChanged);
         ExcutePoulateAction();
     }
+    public void ForEachVisible(Action<int, GameObject> onItem)
+    {
+        foreach (var item in activeItems)
+        {
+            onItem(item.index, item.item);
+        }
+    }
+    #endregion
 
+    #region functions
     private void ExcutePoulateAction()
     {
         foreach (var pair in activeItems)
         {
-            OnItemPopulate(pair.index, pair.item);
+            OnItemShow(pair.index, pair.item);
         }
     }
 
@@ -110,21 +117,21 @@ public class ListOptmizer : MonoBehaviour
     }
     private void ReSortItems()
     {
-        if (startIndex != oldStartIndex)//1>0
+        if (startIndex != oldStartIndex)//need to be optmized
         {
             for (int i = 0; i < activeItems.Count; i++)
             {
                 activeItems[i].index = startIndex + i;
-                this.OnItemPopulate(activeItems[i].index, activeItems[i].item);
+                this.OnItemHide(activeItems[i].index, activeItems[i].item);
+                this.OnItemShow(activeItems[i].index, activeItems[i].item);
             }
         }
     }
-
     private void UpdateStartAndEnd(float value)
     {
         startIndex = Mathf.FloorToInt((100 - value * 100) / itemHeighPercintage);
         endIndex = startIndex + VisibleItemsNumber - 1;
-        if (startIndex <0)
+        if (startIndex < 0)
         {
             startIndex = 0;
             endIndex = VisibleItemsNumber;
@@ -135,7 +142,6 @@ public class ListOptmizer : MonoBehaviour
             endIndex = totallItemsNumber;
         }
     }
-
     private void ResizePanels()
     {
         var rect = rearFiller.rect;
@@ -149,8 +155,7 @@ public class ListOptmizer : MonoBehaviour
         LayoutRebuilder.ForceRebuildLayoutImmediate(content.GetComponent<RectTransform>());
     }
 
-    #endregion
-    #region functions
+
     private void CreateFillers()
     {
         var newGameObject = new GameObject();

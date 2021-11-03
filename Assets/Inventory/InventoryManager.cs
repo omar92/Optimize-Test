@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class InventoryManager : MonoBehaviour
 {
+    [Tooltip(tooltip: "Refrence to the list optmizer tool.")]
     public ListOptmizer InvintoryList;
 
     [Tooltip(tooltip: "Loads the list using this format.")]
@@ -21,10 +22,9 @@ public class InventoryManager : MonoBehaviour
     {
         public InventoryItemData[] ItemDatas;
     }
-
     private InventoryItemData[] ItemDatas;
 
-    private List<InventoryItem> Items;
+    private int selectedItemIndex = 0;
 
     void Start()
     {
@@ -36,11 +36,18 @@ public class InventoryManager : MonoBehaviour
             var inventoryItem = item.GetComponent<InventoryItem>();
             inventoryItem.Icon.sprite = Icons[ItemDatas[i].IconIndex];
             inventoryItem.Name.text = ItemDatas[i].Name;
-            inventoryItem.Button.onClick.AddListener(() => { InventoryItemOnClick(inventoryItem, ItemDatas[i]); });
-        });
+            inventoryItem.Button.onClick.AddListener(() => { SelectInventoryItem(i, ItemDatas[i]); });
 
-        // Select the first item.
-        InventoryItemOnClick(InvintoryList.activeItems[0].item.GetComponent<InventoryItem>(), ItemDatas[0]);
+            if (i == selectedItemIndex)
+            {
+                SetClicked(inventoryItem,true);
+            }
+        }, (i, item) =>
+        {
+            var inventoryItem = item.GetComponent<InventoryItem>();
+            inventoryItem.Button.onClick.RemoveAllListeners();
+            SetClicked(inventoryItem, false);
+        });
     }
 
     /// <summary>
@@ -64,13 +71,26 @@ public class InventoryManager : MonoBehaviour
         return finalItemDatas;
     }
 
-    private void InventoryItemOnClick(InventoryItem itemClicked, InventoryItemData itemData)
-    {   //just to complete cycle for now 
-        foreach (var item in InvintoryList.activeItems)
+    private void SelectInventoryItem(int index, InventoryItemData itemData)
+    {
+        InvintoryList.ForEachVisible((i, item) =>
         {
-            var inventoryItem = item.item.GetComponent<InventoryItem>();
-            inventoryItem.Background.color = Color.white;
-        }
-        itemClicked.Background.color = Color.red;
+            if (i == selectedItemIndex)
+            {
+                var inventoryItem = item.GetComponent<InventoryItem>();
+                SetClicked(inventoryItem, false);
+            }
+            if (i == index)
+            {
+                var inventoryItem = item.GetComponent<InventoryItem>();
+                SetClicked(inventoryItem, true);
+            }
+        });
+        selectedItemIndex = index;
+    }
+
+    private static void SetClicked(InventoryItem inventoryItem, bool isClicked)
+    {
+        inventoryItem.Background.color = isClicked ? Color.red : Color.white;
     }
 }
