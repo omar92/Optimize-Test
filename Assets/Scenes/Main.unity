@@ -482,7 +482,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -29.892944}
+  m_AnchoredPosition: {x: 0, y: -29.892822}
   m_SizeDelta: {x: 0, y: -59.78601}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &407881585
@@ -1132,9 +1132,9 @@ RectTransform:
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -5.682495, y: -60.09668}
-  m_SizeDelta: {x: -51.354996, y: -233.91391}
+  m_AnchorMax: {x: 1, y: 0}
+  m_AnchoredPosition: {x: -5.682495, y: 220.90332}
+  m_SizeDelta: {x: -51.354996, y: 328.0861}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &721236621
 MonoBehaviour:
@@ -1335,6 +1335,17 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1191301969 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5925617255863834747, guid: c759385bbf8c96449ada7fe5de5be095, type: 3}
+  m_PrefabInstance: {fileID: 5290788423382834076}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fdf3c1817ba74c347897ddcbdb6be298, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1249921965
 GameObject:
   m_ObjectHideFlags: 0
@@ -1367,10 +1378,10 @@ RectTransform:
   m_Father: {fileID: 471729012}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -4.182495, y: -105.16049}
-  m_SizeDelta: {x: -48.354996, y: 129.893}
+  m_AnchoredPosition: {x: -4.182495, y: 175.83954}
+  m_SizeDelta: {x: -48.354996, y: -432.107}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1264739473
 GameObject:
@@ -1930,11 +1941,6 @@ MonoBehaviour:
   m_FlexibleWidth: -1
   m_FlexibleHeight: -1
   m_LayoutPriority: 1
---- !u!1 &1831894981 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 5290788423536839237, guid: c759385bbf8c96449ada7fe5de5be095, type: 3}
-  m_PrefabInstance: {fileID: 5290788423382834076}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1869649969
 GameObject:
   m_ObjectHideFlags: 0
@@ -2048,9 +2054,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6dabafdc4b7f95e47a109e19078aef28, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  InfoPanel: {fileID: 721236621}
-  InventoryItemPrefab: {fileID: 6081411390659113483, guid: 46ded8a5055eb4241b31608b2989c5c4, type: 3}
-  Container: {fileID: 1831894981}
+  InvintoryList: {fileID: 1191301969}
   ItemJson: "{\r\n    \"ItemDatas\":\r\n    [\r\n        {\r\n            \"Name\":
     \"carton of ice cream\",\r\n            \"Description\": \"A carton of ice cream.\",\r\n           
     \"Stat\": 94,\r\n            \"IconIndex\": 29\r\n        },\r\n        {\r\n           
@@ -2763,6 +2767,10 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3306651746431875682, guid: c759385bbf8c96449ada7fe5de5be095, type: 3}
+      propertyPath: selectedItemIndex
+      value: 
+      objectReference: {fileID: 11400000, guid: e4304172efbb0ed489ad77753057e0ac, type: 2}
     - target: {fileID: 3702026433178877520, guid: c759385bbf8c96449ada7fe5de5be095, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -2893,7 +2901,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5290788423221505224, guid: c759385bbf8c96449ada7fe5de5be095, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -26.000244
+      value: -26
       objectReference: {fileID: 0}
     - target: {fileID: 5290788423221505224, guid: c759385bbf8c96449ada7fe5de5be095, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x

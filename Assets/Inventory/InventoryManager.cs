@@ -33,21 +33,9 @@ public class InventoryManager : MonoBehaviour
         // populate items in the Scroll View with correct data.
         InvintoryList.PopulateList(ItemDatas.Length, (i, item) =>
         {
+            item.name = $"{i}:{ItemDatas[i].Name}";
             var inventoryItem = item.GetComponent<InventoryItem>();
-            inventoryItem.Icon.sprite = Icons[ItemDatas[i].IconIndex];
-            inventoryItem.Name.text = ItemDatas[i].Name;
-            inventoryItem.Button.onClick.AddListener(() => { SelectInventoryItem(i); });
-
-            if (i == selectedItemIndex)//set selected if it was the last selected item
-            {
-                inventoryItem.SetClicked(true);
-            }
-
-        }, (i, item) =>//reset the item to defult state so it can be used again for another item
-        {
-            var inventoryItem = item.GetComponent<InventoryItem>();
-            inventoryItem.Button.onClick.RemoveAllListeners();
-            inventoryItem.SetClicked(false);
+            inventoryItem.SetData(i, ItemDatas[i], Icons[ItemDatas[i].IconIndex]);
         });
     }
 
@@ -71,30 +59,5 @@ public class InventoryManager : MonoBehaviour
 
         return finalItemDatas;
     }
-
-
-    /// <summary>
-    /// select item from inventory acording to index.
-    /// </summary>
-    /// <param name="index">the item index from the data.</param>
-    private void SelectInventoryItem(int index)
-    {
-        InvintoryList.ForEachVisible((i, item) =>
-        {
-            if (i == selectedItemIndex)
-            {
-                var inventoryItem = item.GetComponent<InventoryItem>();//used GetComponent inside if to reduce the search operations
-                inventoryItem.SetClicked(false);
-
-            }
-            else if (i == index)
-            {
-                var inventoryItem = item.GetComponent<InventoryItem>();//used GetComponent inside if to reduce the search operations
-                inventoryItem.SetClicked(true);
-            }
-        });
-        selectedItemIndex = index;
-    }
-
 
 }

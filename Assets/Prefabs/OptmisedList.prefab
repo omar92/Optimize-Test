@@ -350,7 +350,6 @@ MonoBehaviour:
   ItemTemplate: {fileID: 5290788424818519295}
   content: {fileID: 5290788423536839238}
   scrollbarVertical: {fileID: 5290788424459742259}
-  maxInistances: 0
 --- !u!1 &5290788424257394918
 GameObject:
   m_ObjectHideFlags: 0
@@ -550,21 +549,6 @@ MonoBehaviour:
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
-    m_PersistentCalls:
-      m_Calls: []
---- !u!114 &3500617654360660560
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5290788424818519295}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 94d94ed5d5e2b7e4dbaa7165707de6bc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  OnData:
     m_PersistentCalls:
       m_Calls: []
 --- !u!1 &5290788424900891660

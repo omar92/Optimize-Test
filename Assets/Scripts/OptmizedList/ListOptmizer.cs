@@ -74,7 +74,7 @@ public class ListOptmizer : MonoBehaviour
     //#endregion
 
     #region methods
-    public void PopulateList(int itemsNumber, Action<int, GameObject> OnItemShow, Action<int, GameObject> OnItemHide)
+    public void PopulateList(int itemsNumber, Action<int, GameObject> OnItemShow=null, Action<int, GameObject> OnItemHide=null)
     {
         this.totallItemsNumber = itemsNumber;
         this.OnItemShow = OnItemShow;
@@ -104,7 +104,7 @@ public class ListOptmizer : MonoBehaviour
     {
         foreach (var pair in activeItems)
         {
-            OnItemShow(pair.index, pair.item);
+            OnItemShow?.Invoke(pair.index, pair.item);
         }
     }
 
@@ -121,9 +121,9 @@ public class ListOptmizer : MonoBehaviour
         {
             for (int i = 0; i < activeItems.Count; i++)
             {
-                this.OnItemHide(activeItems[i].index, activeItems[i].item);
+                this.OnItemHide?.Invoke(activeItems[i].index, activeItems[i].item);
                 activeItems[i].index = startIndex + i;
-                this.OnItemShow(activeItems[i].index, activeItems[i].item);
+                this.OnItemShow?.Invoke(activeItems[i].index, activeItems[i].item);
             }
         }
     }
