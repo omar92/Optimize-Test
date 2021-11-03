@@ -31,10 +31,10 @@ public class ListOptmizer : MonoBehaviour
     float itemHeighPercintage = 0;
     Action<int, GameObject> OnItemPopulate;
 
-    List<ItemIndexPair> activeItems;
+   public List<ItemIndexPair> activeItems;
 
 
-    class ItemIndexPair
+    public class ItemIndexPair
     {
         public ItemIndexPair(int index, GameObject gameobject)
         {

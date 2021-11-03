@@ -4,10 +4,7 @@ using UnityEngine;
 
 public class InventoryManager : MonoBehaviour
 {
-    public InventoryInfoPanel InfoPanel;
-    public InventoryItem InventoryItemPrefab;
-
-    public GameObject Container;
+    public ListOptmizer InvintoryList;
 
     [Tooltip(tooltip: "Loads the list using this format.")]
     [Multiline]
@@ -31,29 +28,19 @@ public class InventoryManager : MonoBehaviour
 
     void Start()
     {
-        // Clear existing items already in the list.
-        var items = Container.GetComponentsInChildren<InventoryItem>();
-        foreach (InventoryItem item in items)
-        {
-            item.gameObject.transform.SetParent(null);
-        }
-
         ItemDatas = GenerateItemDatas(ItemJson, ItemGenerateScale);
 
         // Instantiate items in the Scroll View.
-        Items = new List<InventoryItem>();
-        foreach (InventoryItemData itemData in ItemDatas)
+        InvintoryList.PopulateList(ItemDatas.Length, (i, item) =>
         {
-            var newItem = GameObject.Instantiate<InventoryItem>(InventoryItemPrefab);
-            newItem.Icon.sprite = Icons[itemData.IconIndex];
-            newItem.Name.text = itemData.Name;
-            newItem.transform.SetParent(Container.transform);
-            newItem.Button.onClick.AddListener(() => { InventoryItemOnClick(newItem, itemData); });
-            Items.Add(newItem);
-        }
+            var inventoryItem = item.GetComponent<InventoryItem>();
+            inventoryItem.Icon.sprite = Icons[ItemDatas[i].IconIndex];
+            inventoryItem.Name.text = ItemDatas[i].Name;
+            inventoryItem.Button.onClick.AddListener(() => { InventoryItemOnClick(inventoryItem, ItemDatas[i]); });
+        });
 
         // Select the first item.
-        InventoryItemOnClick(Items[0], ItemDatas[0]);
+        InventoryItemOnClick(InvintoryList.activeItems[0].item.GetComponent<InventoryItem>(), ItemDatas[0]);
     }
 
     /// <summary>
@@ -78,10 +65,11 @@ public class InventoryManager : MonoBehaviour
     }
 
     private void InventoryItemOnClick(InventoryItem itemClicked, InventoryItemData itemData)
-    {
-        foreach (var item in Items)
+    {   //just to complete cycle for now 
+        foreach (var item in InvintoryList.activeItems)
         {
-            item.Background.color = Color.white;
+            var inventoryItem = item.item.GetComponent<InventoryItem>();
+            inventoryItem.Background.color = Color.white;
         }
         itemClicked.Background.color = Color.red;
     }
