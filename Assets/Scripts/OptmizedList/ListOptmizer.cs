@@ -21,6 +21,7 @@ public class ListOptmizer : MonoBehaviour
     private RectTransform frontFiller;
     private int startIndex = 0;
     private int endIndex = 0;
+    private int oldStartIndex = -1;
     float ItemHeight = 0;
     float itemsSpacing = 0;
     float ViewportHeight = 0;
@@ -28,8 +29,23 @@ public class ListOptmizer : MonoBehaviour
     int totallItemsNumber = 0;
     float ContentHeight = 0;
     float itemHeighPercintage = 0;
+    Action<int, GameObject> OnItemPopulate;
 
-    List<GameObject> visbleItems;
+    List<ItemIndexPair> activeItems;
+
+
+    class ItemIndexPair
+    {
+        public ItemIndexPair(int index, GameObject gameobject)
+        {
+            this.index = index;
+            this.item = gameobject;
+        }
+        public int index;
+        public GameObject item;
+    }
+
+
     #endregion
 
 
@@ -41,9 +57,19 @@ public class ListOptmizer : MonoBehaviour
 
     void Start()
     {
-        PopulateList(100, (i) =>
+        PopulateList(100, (i, gameObject) =>
         {
-            Debug.Log($"Populate item {i}");
+            gameObject.name = ItemTemplate.name + ":" + i;
+            var text = gameObject.GetComponentInChildren<TMPro.TMP_Text>();
+            if (text)
+            {
+                text.text = "" + i;
+            }
+            else
+            {
+                Debug.Log($"cant find TMP_Text of {i}");
+            }
+
         });
     }
     #endregion
@@ -51,20 +77,50 @@ public class ListOptmizer : MonoBehaviour
     #region methods
 
 
-    public void PopulateList(int itemsNumber, Action<int> OnItemPopulate)
+    public void PopulateList(int itemsNumber, Action<int, GameObject> OnItemPopulate)
     {
         this.totallItemsNumber = itemsNumber;
+        this.OnItemPopulate = OnItemPopulate;
         ClearOldItems();
         CalculateMeasures();
         CreateVisibleItems();
         CreateFillers();
         startIndex = 0;
+        oldStartIndex = -1;
         endIndex = VisibleItemsNumber - 1;
         ResizePanels();
         scrollbarVertical.onValueChanged.AddListener(OnScrollValueChanged);
+        ExcutePoulateAction();
+    }
+
+    private void ExcutePoulateAction()
+    {
+        foreach (var pair in activeItems)
+        {
+            OnItemPopulate(pair.index, pair.item);
+        }
     }
 
     private void OnScrollValueChanged(float value)
+    {
+        UpdateStartAndEnd(value);
+        ResizePanels();
+        ReSortItems();
+        oldStartIndex = startIndex;
+    }
+    private void ReSortItems()
+    {
+        if (startIndex != oldStartIndex)//1>0
+        {
+            for (int i = 0; i < activeItems.Count; i++)
+            {
+                activeItems[i].index = startIndex + i;
+                this.OnItemPopulate(activeItems[i].index, activeItems[i].item);
+            }
+        }
+    }
+
+    private void UpdateStartAndEnd(float value)
     {
         startIndex = Mathf.FloorToInt((100 - value * 100) / itemHeighPercintage);
         endIndex = startIndex + VisibleItemsNumber - 1;
@@ -73,7 +129,6 @@ public class ListOptmizer : MonoBehaviour
             startIndex = totallItemsNumber - VisibleItemsNumber;
             endIndex = totallItemsNumber;
         }
-        ResizePanels();
     }
 
     private void ResizePanels()
@@ -140,11 +195,11 @@ public class ListOptmizer : MonoBehaviour
 
     private void CreateVisibleItems()
     {
-        visbleItems = new List<GameObject>();
+        activeItems = new List<ItemIndexPair>();
         ItemTemplate.SetActive(true);
         for (int i = 0; i < VisibleItemsNumber; i++)
         {
-            visbleItems.Add(GameObject.Instantiate(ItemTemplate, content));
+            activeItems.Add(new ItemIndexPair(i, GameObject.Instantiate(ItemTemplate, content)));
         }
         ItemTemplate.SetActive(false);
     }
