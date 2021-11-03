@@ -6,27 +6,30 @@ using ScriptableSystem;
 
 public class InventoryItem : MonoBehaviour
 {
-    public Image Background;
-    public Image Icon;
-    public TextMeshProUGUI Name;
-    public Button Button;
-    public IntSO selectedItemIndex;
-    public InventoryItemDataSO currentInventoryItemData;
-    public EventSO OnItemsSeleccted;
+    [Header("Item Parts")]
+    [SerializeField] private Image Background;
+    [SerializeField] private Image Icon;
+    [SerializeField] private TextMeshProUGUI Name;
+    [SerializeField] private Button Button;
+
+    [Header("So Variables")]
+    [SerializeField] private IntSO selectedItemIndex;
+    [SerializeField] private InventoryItemDataSO currentInventoryItemData;
+    [SerializeField] private SpriteSO currentSprite;
+
+    [Header("So Events")]
+    [SerializeField] private EventSO OnItemsSeleccted;
 
     private int index;
     private bool isClicked;
     private InventoryItemData inventoryItemData;
-
 
     private void Start()
     {
         Button.onClick.RemoveAllListeners();
         Button.onClick.AddListener(() =>
         {
-            selectedItemIndex.Value = index;
-            currentInventoryItemData.Value = inventoryItemData;
-            OnItemsSeleccted.Raise();
+            OnClick();
         });
     }
 
@@ -65,10 +68,16 @@ public class InventoryItem : MonoBehaviour
         }
     }
 
-
     private void SetClicked(bool isClicked)
     {
         Background.color = isClicked ? Color.red : Color.white;
         this.isClicked = isClicked;
+    }
+    private void OnClick()
+    {
+        selectedItemIndex.Value = index;
+        currentInventoryItemData.Value = inventoryItemData;
+        currentSprite.Value = Icon.sprite;
+        OnItemsSeleccted.Raise();
     }
 }

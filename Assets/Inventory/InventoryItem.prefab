@@ -375,6 +375,7 @@ MonoBehaviour:
   Button: {fileID: 5462570301140289662}
   selectedItemIndex: {fileID: 11400000, guid: e4304172efbb0ed489ad77753057e0ac, type: 2}
   currentInventoryItemData: {fileID: 11400000, guid: 8238fe4f52ab1354eae1abb618d6bce7, type: 2}
+  currentSprite: {fileID: 11400000, guid: 89d424c0cf7304c42bea4e9abd7c3b9f, type: 2}
   OnItemsSeleccted: {fileID: 11400000, guid: e222ab03678524e4d84b5888c8d5cd6b, type: 2}
 --- !u!114 &8225524995467717673
 MonoBehaviour:
@@ -385,7 +386,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 3524837760268592278}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5de740a284f83bf49a3dd1d4f3146a16, type: 3}
+  m_Script: {fileID: 11500000, guid: 30cced3a05749594e8b8b86b914206fe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   soEventCallbacks:

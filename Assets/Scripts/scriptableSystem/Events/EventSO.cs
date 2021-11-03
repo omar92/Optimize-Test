@@ -10,7 +10,7 @@ namespace ScriptableSystem
     [CreateAssetMenu(fileName = "EventSO", menuName = "SO/Event")]
     public class EventSO : ScriptableObject
     {
-        Dictionary<SOEventListener, UnityEvent<object>> callbacks = new Dictionary<SOEventListener, UnityEvent<object>>();
+        Dictionary<EventSOListener, UnityEvent<object>> callbacks = new Dictionary<EventSOListener, UnityEvent<object>>();
 
         public void Raise()
         {
@@ -35,7 +35,7 @@ namespace ScriptableSystem
             }
         }
 
-        public void Subscribe(SOEventListener listener, UnityEvent<object> calback)
+        public void Subscribe(EventSOListener listener, UnityEvent<object> calback)
         {
             if (!callbacks.ContainsKey(listener))
             {
@@ -47,7 +47,7 @@ namespace ScriptableSystem
             }
         }
 
-        public void UnSubscribe(SOEventListener listener)
+        public void UnSubscribe(EventSOListener listener)
         {
             if (callbacks.ContainsKey(listener))
             {

@@ -4,16 +4,16 @@ using UnityEngine;
 using UnityEngine.Events;
 namespace ScriptableSystem
 {
-    public class SOEventListener : MonoBehaviour
+    public class EventSOListener : MonoBehaviour
     {
         [System.Serializable]
-        public struct SOEventCallbacksPair
+        public struct EventSOCallbacksPair
         {
             public EventSO soEvent;
             public UnityEvent<object> onRaise;
         }
 
-        public SOEventCallbacksPair[] soEventCallbacks = new SOEventCallbacksPair[0];
+        public EventSOCallbacksPair[] soEventCallbacks = new EventSOCallbacksPair[0];
 
         private void OnEnable()
         {
