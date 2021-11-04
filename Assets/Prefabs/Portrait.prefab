@@ -213,8 +213,8 @@ MonoBehaviour:
       m_PersistentCalls:
         m_Calls:
         - m_Target: {fileID: 2306599837205017982}
-          m_TargetAssemblyTypeName: SetSoSpriteToImage, Assembly-CSharp
-          m_MethodName: SetImage
+          m_TargetAssemblyTypeName: SetInventoryItemImage, Assembly-CSharp
+          m_MethodName: OnItemSelected
           m_Mode: 1
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
@@ -241,8 +241,8 @@ MonoBehaviour:
       m_PersistentCalls:
         m_Calls:
         - m_Target: {fileID: 2306599837205017982}
-          m_TargetAssemblyTypeName: SetSoSpriteToImage, Assembly-CSharp
-          m_MethodName: SetImage
+          m_TargetAssemblyTypeName: SetInventoryItemImage, Assembly-CSharp
+          m_MethodName: OnDataReady
           m_Mode: 1
           m_Arguments:
             m_ObjectArgument: {fileID: 0}

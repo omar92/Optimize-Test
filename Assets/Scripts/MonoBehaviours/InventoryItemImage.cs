@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 [RequireComponent(typeof(Image))]
-public class SetInventoryItemImage : MonoBehaviour
+public class InventoryItemImage : MonoBehaviour
 {
     [Header("So variables")]
     [Tooltip(tooltip: "SO to contain the parsed data.")]
@@ -15,12 +15,22 @@ public class SetInventoryItemImage : MonoBehaviour
 
     private Image image;
 
+
+    public void OnDataReady()
+    {
+        UpdateImage();
+    }
+    public void OnItemSelected()
+    {
+        UpdateImage();
+    }
+
     private void Awake()
     {
         image = GetComponent<Image>();
     }
 
-    public void SetImage()
+    private void UpdateImage()
     {
         image.sprite = ItemDatas.Value[selectedItemIndex.Value].sprite;
     }
