@@ -31,10 +31,8 @@ public class ListOptmizer : MonoBehaviour
     float itemHeighPercintage = 0;
     Action<int, GameObject> OnItemShow;
     Action<int, GameObject> OnItemHide;
-
     List<ItemIndexPair> activeItems;
-
-
+    private bool isPopulated;
     class ItemIndexPair
     {
         public ItemIndexPair(int index, GameObject gameobject)
@@ -49,32 +47,22 @@ public class ListOptmizer : MonoBehaviour
 
 
     //#region MonoBehaviour
+    private void Start()
+    {
+        scrollbarVertical.onValueChanged.AddListener(OnScrollValueChanged);
+    }
+    public void OnRectTransformDimensionsChange()
+    {
+        if (isPopulated)
+        {
+            OnSizeChange();
+        }
+    }
 
-    //private void Awake()
-    //{
-    //}
-
-    //void Start()
-    //{
-    //    PopulateList(100, (i, gameObject) =>
-    //    {
-    //        gameObject.name = ItemTemplate.name + ":" + i;
-    //        var text = gameObject.GetComponentInChildren<TMPro.TMP_Text>();
-    //        if (text)
-    //        {
-    //            text.text = "" + i;
-    //        }
-    //        else
-    //        {
-    //            Debug.Log($"cant find TMP_Text of {i}");
-    //        }
-
-    //    });
-    //}
     //#endregion
 
     #region methods
-    public void PopulateList(int itemsNumber, Action<int, GameObject> OnItemShow=null, Action<int, GameObject> OnItemHide=null)
+    public void PopulateList(int itemsNumber, Action<int, GameObject> OnItemShow = null, Action<int, GameObject> OnItemHide = null)
     {
         this.totallItemsNumber = itemsNumber;
         this.OnItemShow = OnItemShow;
@@ -87,9 +75,10 @@ public class ListOptmizer : MonoBehaviour
         oldStartIndex = -1;
         endIndex = VisibleItemsNumber - 1;
         ResizePanels();
-        scrollbarVertical.onValueChanged.AddListener(OnScrollValueChanged);
         ExcutePoulateAction();
+        isPopulated = true;
     }
+
     public void ForEachVisible(Action<int, GameObject> onItem)
     {
         foreach (var item in activeItems)
@@ -110,12 +99,33 @@ public class ListOptmizer : MonoBehaviour
 
     private void OnScrollValueChanged(float value)
     {
-        UpdateStartAndEnd(value);
-        ResizePanels();
-        ReSortItems();
-        oldStartIndex = startIndex;
+        if (isPopulated)
+        {
+            UpdateStartAndEnd(value);
+            ResizePanels();
+            ReSortItems();
+            oldStartIndex = startIndex;
+        }
     }
-    private void ReSortItems()
+    private void OnSizeChange() //TODO: inhance
+    {
+        ClearOldItems();
+        CalculateMeasures();
+        CreateVisibleItems();
+        CreateFillers();
+        oldStartIndex = -1;
+        endIndex = startIndex + VisibleItemsNumber - 1;
+        ExcutePoulateAction();
+        //MoveScrollbarToSelected(); //if not used the scroll will return to start when size change 
+    }
+
+    private void MoveScrollbarToSelected()//TODO: fix as it go to wrong position
+    {
+        var startPercintage = itemHeighPercintage/100 * startIndex;
+        scrollbarVertical.value = 1- startPercintage;
+    }
+
+    private void ReSortItems()//TODO: inhance
     {
         if (startIndex != oldStartIndex)//need to be optmized
         {
