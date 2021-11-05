@@ -1,4 +1,3 @@
-
 using ScriptableSystem;
 using UnityEngine;
 
@@ -21,10 +20,8 @@ public class InventoryHandler : MonoBehaviour
         });
     }
 
-
     public void OnDataIsReady()
     {
         FillTheList();
     }
-
 }

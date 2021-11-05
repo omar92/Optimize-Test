@@ -1,6 +1,4 @@
 using ScriptableSystem;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -12,9 +10,7 @@ public class InventoryItemImage : MonoBehaviour
     [SerializeField] private InventoryItemsDataSO ItemDatas;
     [Tooltip(tooltip: "SO Indicate current selected item.")]
     [SerializeField] private IntSO selectedItemIndex;
-
     private Image image;
-
 
     public void OnDataReady()
     {
@@ -34,5 +30,4 @@ public class InventoryItemImage : MonoBehaviour
     {
         image.sprite = ItemDatas.Value[selectedItemIndex.Value].sprite;
     }
-
 }

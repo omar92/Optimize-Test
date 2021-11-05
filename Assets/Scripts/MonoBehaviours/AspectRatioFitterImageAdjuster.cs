@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -7,6 +5,7 @@ using UnityEngine.UI;
 [RequireComponent(typeof(Image))]
 public class AspectRatioFitterImageAdjuster : MonoBehaviour
 {
+    //this component is used to keep the image aspect ration after image is changed 
     AspectRatioFitter arf;
     private Image image;
 
@@ -14,7 +13,6 @@ public class AspectRatioFitterImageAdjuster : MonoBehaviour
     {
         arf = GetComponent<AspectRatioFitter>();
         image = GetComponent<Image>();
-
     }
 
     public void Adjust()

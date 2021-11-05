@@ -34,7 +34,11 @@ namespace ScriptableSystem
                 kvp.Value.Invoke(value);
             }
         }
-
+        /// <summary>
+        /// register listtener in this even so it will be invoked when this event is raised
+        /// </summary>
+        /// <param name="listener"></param>
+        /// <param name="calback"></param>
         public void Subscribe(EventSOListener listener, UnityEvent<object> calback)
         {
             if (!callbacks.ContainsKey(listener))
@@ -46,7 +50,10 @@ namespace ScriptableSystem
                 callbacks[listener] = calback;
             }
         }
-
+        /// <summary>
+        /// remove the listener from this event
+        /// </summary>
+        /// <param name="listener"></param>
         public void UnSubscribe(EventSOListener listener)
         {
             if (callbacks.ContainsKey(listener))

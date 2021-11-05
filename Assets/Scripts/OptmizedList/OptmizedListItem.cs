@@ -1,17 +1,11 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
+/// <summary>
+/// this component can be used on items to fire unityEvents when item show or hide
+/// </summary>
 public class OptmizedListItem : MonoBehaviour
 {
-
-    public UnityEvent<object> OnData;
-
-
-    public void SetData(object data)
-    {
-        OnData.Invoke(data);
-    }
-
+    public UnityEvent<int> OnShow;
+    public UnityEvent<int> OnHide;
 }

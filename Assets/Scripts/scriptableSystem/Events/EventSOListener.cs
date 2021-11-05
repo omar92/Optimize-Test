@@ -4,6 +4,9 @@ using UnityEngine;
 using UnityEngine.Events;
 namespace ScriptableSystem
 {
+    /// <summary>
+    /// used to invoke unity actions when corrosponding event is raised
+    /// </summary>
     public class EventSOListener : MonoBehaviour
     {
         [System.Serializable]
