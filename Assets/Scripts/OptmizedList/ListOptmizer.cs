@@ -139,7 +139,7 @@ public class ListOptmizer : MonoBehaviour
 
     /// <summary>
     /// this is called when the rectTransfrom size changes 
-    /// it is used to update the list to handle the new size chage
+    /// it is used to update the list to handle the new size change
     /// </summary>
     private void OnSizeChange() //TODO: inhance
     {
@@ -150,13 +150,6 @@ public class ListOptmizer : MonoBehaviour
         oldStartIndex = -1;
         endIndex = startIndex + VisibleItemsNumber - 1;
         ExcuteOnItemShowAction();
-        //MoveScrollbarToSelected(); //if not used the scroll will return to start when size change 
-    }
-
-    private void MoveScrollbarToSelected()//TODO: fix as it go to wrong position
-    {
-        var startPercintage = itemHeighPercintage / 100 * startIndex;
-        scrollbarVertical.value = 1 - startPercintage;
     }
 
     /// <summary>
