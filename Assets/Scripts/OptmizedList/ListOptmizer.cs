@@ -121,22 +121,60 @@ public class ListOptmizer : MonoBehaviour
 
     private void MoveScrollbarToSelected()//TODO: fix as it go to wrong position
     {
-        var startPercintage = itemHeighPercintage/100 * startIndex;
-        scrollbarVertical.value = 1- startPercintage;
+        var startPercintage = itemHeighPercintage / 100 * startIndex;
+        scrollbarVertical.value = 1 - startPercintage;
     }
 
-    private void ReSortItems()//TODO: inhance
+    private void ReSortItems()
     {
-        if (startIndex != oldStartIndex)//need to be optmized
+        if (startIndex != oldStartIndex)
         {
-            for (int i = 0; i < activeItems.Count; i++)
+            if (startIndex > oldStartIndex)
             {
-                this.OnItemHide?.Invoke(activeItems[i].index, activeItems[i].item);
-                activeItems[i].index = startIndex + i;
-                this.OnItemShow?.Invoke(activeItems[i].index, activeItems[i].item);
+                for (int i = 0; i < activeItems.Count; i++)
+                {
+                    if (activeItems[i].index < startIndex)
+                    {
+                        activeItems[i].index = endIndex - i;
+                        MoveToEndOfItems(activeItems[i].item, i);
+                        OnItemShow?.Invoke(activeItems[i].index, activeItems[i].item);
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
             }
+            else
+            {
+                for (int i = activeItems.Count - 1; i >= 0; i--)
+                {
+                    if (activeItems[i].index > endIndex)
+                    {
+                        activeItems[i].index = startIndex + (activeItems.Count - 1 - i);
+                        MoveToStartOfItems(activeItems[i].item, activeItems.Count - 1 - i);
+                        OnItemShow?.Invoke(activeItems[i].index, activeItems[i].item);
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+            }
+
+            activeItems.Sort((item1, item2) => { return item1.index - item2.index; });
         }
     }
+
+    private void MoveToEndOfItems(GameObject item, int shift)
+    {
+        item.transform.SetSiblingIndex((frontFiller.GetSiblingIndex() - 1) - shift);
+    }
+    private void MoveToStartOfItems(GameObject item, int shift)
+    {
+        item.transform.SetSiblingIndex((rearFiller.GetSiblingIndex() + 1) + shift);
+    }
+
     private void UpdateStartAndEnd(float value)
     {
         startIndex = Mathf.FloorToInt((100 - value * 100) / itemHeighPercintage);
@@ -144,22 +182,20 @@ public class ListOptmizer : MonoBehaviour
         if (startIndex < 0)
         {
             startIndex = 0;
-            endIndex = VisibleItemsNumber;
+            endIndex = VisibleItemsNumber - 1;
         }
         if (endIndex >= totallItemsNumber)
         {
             startIndex = totallItemsNumber - VisibleItemsNumber;
-            endIndex = totallItemsNumber;
+            endIndex = totallItemsNumber - 1;
         }
     }
     private void ResizePanels()
     {
-        var rect = rearFiller.rect;
         var height = startIndex * (ItemHeight + itemsSpacing) - itemsSpacing; //the space before the visble items
         rearFiller.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, height); //.sert rect.Set(rect.x, rect.y, space, space);
 
-        rect = frontFiller.rect;
-        height = (totallItemsNumber - endIndex) * (ItemHeight + itemsSpacing) - itemsSpacing; //the space after the visble items
+        height = (totallItemsNumber - endIndex - 1) * (ItemHeight + itemsSpacing) - itemsSpacing; //the space after the visble items
         frontFiller.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, height);
 
         LayoutRebuilder.ForceRebuildLayoutImmediate(content.GetComponent<RectTransform>());
