@@ -9,27 +9,31 @@ public class ListOptmizer : MonoBehaviour
 {
     #region parameters
     [Header("Item Template")]
-    [Tooltip(tooltip: "refrence to the GameObject that will be used to fill the list.")]
+    [Tooltip(tooltip: "reference to the GameObject that will be used to fill the list.")]
     [SerializeField] private GameObject ItemTemplate;
-    [Tooltip(tooltip: "refrence to the GameObject that will be used to fill the list.")]
-    [SerializeField] private RectTransform content;
-    [SerializeField] private Scrollbar scrollbarVertical;
-    [Tooltip(tooltip: "Maximum number of inistances at the same time.")]
+    [Header("Scrollbar")]
+    private ScrollRect scrollRect;
+    private Scrollbar scrollbarVertical;
+    private Scrollbar scrollbarHorizintal;
+    private RectTransform content;
     #endregion
 
-    #region variabls
+    #region variables
+    private bool isHorizintal = true;
     private RectTransform rearFiller;
     private RectTransform frontFiller;
     private int startIndex = 0;
     private int endIndex = 0;
     private int oldStartIndex = -1;
-    private float ItemHeight = 0;
     private float itemsSpacing = 0;
-    private float ViewportHeight = 0;
+
+    private float ItemLength = 0;
+    private float ContentLength = 0;
+    private float itemLengthPercintage = 0;
+    private float ViewportLength = 0;
+
     private int VisibleItemsNumber = 0;
     private int totallItemsNumber = 0;
-    private float ContentHeight = 0;
-    private float itemHeighPercintage = 0;
     private Action<int, GameObject> OnItemShow;
     private Action<int, GameObject> OnItemHide;
     private List<ItemIndexPair> activeItems;
@@ -55,11 +59,35 @@ public class ListOptmizer : MonoBehaviour
     #region MonoBehaviour
     private void Start()
     {
-        scrollbarVertical.onValueChanged.AddListener(OnScrollValueChanged);
+        if (scrollRect == null)
+        {
+            scrollRect = GetComponent<ScrollRect>();
+        }
+        if (scrollbarVertical == null)
+        {
+            scrollbarVertical = scrollRect.verticalScrollbar;
+        }
+        if (scrollbarHorizintal == null)
+        {
+            scrollbarHorizintal = scrollRect.horizontalScrollbar;
+        }
+        if (content == null)
+        {
+            content = scrollRect.content;
+        }
+        if (ItemTemplate == null)
+        {
+            Debug.LogError("ItemTemplate is null");
+            return;
+        }
+        if (scrollbarHorizintal != null)
+            scrollbarHorizintal.onValueChanged.AddListener(OnScrollValueChanged);
+        if (scrollbarVertical != null)
+            scrollbarVertical.onValueChanged.AddListener(OnScrollValueChanged);
     }
 
     /// <summary>
-    /// unity event to detect Ui size changes
+    /// unity event to detect UI size changes
     /// </summary>
     public void OnRectTransformDimensionsChange()
     {
@@ -71,6 +99,10 @@ public class ListOptmizer : MonoBehaviour
     #endregion
     #region methods
 
+    private void Awake()
+    {
+        ItemTemplate.gameObject.SetActive(false);
+    }
     /// <summary>
     /// Used to build the list items
     /// </summary>
@@ -79,19 +111,31 @@ public class ListOptmizer : MonoBehaviour
     /// <param name="OnItemHide">callback that is invoked when item disappear</param>
     public void PopulateList(int itemsNumber, Action<int, GameObject> OnItemShow = null, Action<int, GameObject> OnItemHide = null)
     {
-        this.totallItemsNumber = itemsNumber;
-        this.OnItemShow = OnItemShow;
-        this.OnItemHide = OnItemHide;
-        ClearOldItems();
-        CalculateMeasures();
-        CreateVisibleItems();
-        CreateFillers();
-        startIndex = 0;
-        oldStartIndex = -1;
-        endIndex = VisibleItemsNumber - 1;
-        ResizeFillers();
-        ExcuteOnItemShowAction();
-        isPopulated = true;
+        ItemTemplate.gameObject.SetActive(true);
+        Z.InvokeEndOfFrame(() =>
+        {
+            isHorizintal = scrollRect.horizontal;
+            if (isHorizintal && scrollRect.vertical)
+            {
+                Debug.LogError("You can't have both horizontal and vertical enabled\n vertical will be disabled");
+                scrollRect.vertical = false;
+            }
+
+            this.totallItemsNumber = itemsNumber;
+            this.OnItemShow = OnItemShow;
+            this.OnItemHide = OnItemHide;
+            ClearOldItems();
+            CalculateMeasures();
+            CreateVisibleItems();
+            CreateFillers();
+            startIndex = 0;
+            oldStartIndex = -1;
+            endIndex = VisibleItemsNumber - 1;
+            ResizeFillers();
+            ExcuteOnItemShowAction();
+            isPopulated = true;
+            ItemTemplate.gameObject.SetActive(false);
+        });
     }
 
     /// <summary>
@@ -141,7 +185,7 @@ public class ListOptmizer : MonoBehaviour
     /// this is called when the rectTransfrom size changes 
     /// it is used to update the list to handle the new size change
     /// </summary>
-    private void OnSizeChange() //TODO: inhance
+    private void OnSizeChange() //TODO: enhance
     {
         ClearOldItems();
         CalculateMeasures();
@@ -172,7 +216,7 @@ public class ListOptmizer : MonoBehaviour
                     }
                     else
                     {
-                        break;//when reach already avaliable items stop the iteration 
+                        break;//when reach already available items stop the iteration 
                     }
                 }
             }
@@ -189,7 +233,7 @@ public class ListOptmizer : MonoBehaviour
                     }
                     else
                     {
-                        break;//when reach already avaliable items stop the iteration 
+                        break;//when reach already available items stop the iteration 
                     }
                 }
             }
@@ -205,6 +249,13 @@ public class ListOptmizer : MonoBehaviour
     }
     private void InvokeItemShowCallback(ItemIndexPair pair)
     {
+        if (pair.index >= totallItemsNumber || pair.index < 0)
+        {
+            pair.item.gameObject.SetActive(false);
+            return;
+        }
+
+        pair.item.gameObject.SetActive(true);
         OnItemShow?.Invoke(pair.index, pair.item);
         if (pair.optmizedItem) pair.optmizedItem.OnShow.Invoke(pair.index); //if the item containt component OptmizedListItem Invoke OnShow
     }
@@ -244,7 +295,7 @@ public class ListOptmizer : MonoBehaviour
     /// <param name="value">current slider value</param>
     private void UpdateStartAndEnd(float value)
     {
-        startIndex = Mathf.FloorToInt((100 - value * 100) / itemHeighPercintage);
+        startIndex = Mathf.FloorToInt((100 - value * 100) / itemLengthPercintage);
         endIndex = startIndex + VisibleItemsNumber - 1;
         if (startIndex < 0)
         {
@@ -263,11 +314,26 @@ public class ListOptmizer : MonoBehaviour
     /// </summary>
     private void ResizeFillers()
     {
-        var height = startIndex * (ItemHeight + itemsSpacing) - itemsSpacing; //the space before the visble items
-        rearFiller.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, height);
+        var length = startIndex * (ItemLength + itemsSpacing) - itemsSpacing; //the space before the visble items
+        if (isHorizintal)
+        {
+            rearFiller.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, length);
+        }
+        else
+        {
+            rearFiller.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, length);
+        }
 
-        height = (totallItemsNumber - endIndex - 1) * (ItemHeight + itemsSpacing) - itemsSpacing; //the space after the visble items
-        frontFiller.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, height);
+        length = (totallItemsNumber - endIndex - 1) * (ItemLength + itemsSpacing) - itemsSpacing; //the space after the visble items
+
+        if (isHorizintal)
+        {
+            frontFiller.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, length);
+        }
+        else
+        {
+            frontFiller.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, length);
+        }
 
         LayoutRebuilder.ForceRebuildLayoutImmediate(content.GetComponent<RectTransform>());
     }
@@ -309,7 +375,15 @@ public class ListOptmizer : MonoBehaviour
     /// </summary>
     private void CalculateMeasures()
     {
-        ItemHeight = ItemTemplate.GetComponent<RectTransform>().rect.height;//the height of the single item
+        if (isHorizintal)
+        {
+            ItemLength = ItemTemplate.GetComponent<RectTransform>().rect.width;//the width of the single item
+
+        }
+        else
+        {
+            ItemLength = ItemTemplate.GetComponent<RectTransform>().rect.height;//the height of the single item
+        }
 
         VerticalLayoutGroup vlg = content.GetComponent<VerticalLayoutGroup>();
         if (vlg)
@@ -317,13 +391,20 @@ public class ListOptmizer : MonoBehaviour
             itemsSpacing = vlg.padding.vertical;//the space bettween the items if is used
         }
 
-        ViewportHeight = this.GetComponent<RectTransform>().rect.height;//the visible area height
+        if (isHorizintal)
+        {
+            ViewportLength = this.GetComponent<RectTransform>().rect.width;//the visible area width
+        }
+        else
+        {
+            ViewportLength = this.GetComponent<RectTransform>().rect.height;//the visible area height
+        }
 
-        VisibleItemsNumber = (int)(ViewportHeight / (ItemHeight + itemsSpacing));//the number of the items that can be displayed in the visible area
+        VisibleItemsNumber = (int)(ViewportLength / (ItemLength + itemsSpacing));//the number of the items that can be displayed in the visible area
 
-        ContentHeight = totallItemsNumber * (ItemHeight + itemsSpacing) - itemsSpacing;//the full height of the content
+        ContentLength = totallItemsNumber * (ItemLength + itemsSpacing) - itemsSpacing;//the full height of the content
 
-        itemHeighPercintage = (100 * ItemHeight) / (ContentHeight - (ItemHeight * VisibleItemsNumber));//the single item height percintage to the totall items height
+        itemLengthPercintage = (100 * ItemLength) / (ContentLength - (ItemLength * VisibleItemsNumber));//the single item height percintage to the totall items height
 
         VisibleItemsNumber += 2;//add extra 2 items to make the list look better
     }
