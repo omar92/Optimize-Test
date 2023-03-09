@@ -72,8 +72,8 @@ public class ListOptmizer : MonoBehaviour
             return;
         }
         if (scrollRect.horizontal)
-            scrollRect.onValueChanged.AddListener((v) => { OnScrollValueChanged(1-v.x); });
-        else if (scrollRect.vertical)
+            scrollRect.onValueChanged.AddListener((v) => { OnScrollValueChanged(1 - v.x); });
+        if (scrollRect.vertical)
             scrollRect.onValueChanged.AddListener((v) => { OnScrollValueChanged(v.y); });
     }
 
@@ -302,6 +302,7 @@ public class ListOptmizer : MonoBehaviour
         if (endIndex >= totallItemsNumber)
         {
             startIndex = totallItemsNumber - VisibleItemsNumber;
+            if(startIndex< 0) startIndex = 0;
             endIndex = totallItemsNumber - 1;
         }
     }
@@ -314,23 +315,25 @@ public class ListOptmizer : MonoBehaviour
         var length = startIndex * (ItemLength + itemsSpacing) - itemsSpacing; //the space before the visble items
         if (isHorizintal)
         {
-            rearFiller.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, length);
+            rearFiller.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, Math.Abs(length));
         }
         else
         {
-            rearFiller.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, length);
+            rearFiller.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, Math.Abs(length));
         }
+        rearFiller.localScale = Vector3.one;
 
         length = (totallItemsNumber - endIndex - 1) * (ItemLength + itemsSpacing) - itemsSpacing; //the space after the visble items
 
         if (isHorizintal)
         {
-            frontFiller.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, length);
+            frontFiller.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, Math.Abs(length));
         }
         else
         {
-            frontFiller.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, length);
+            frontFiller.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, Math.Abs(length));
         }
+        frontFiller.localScale = Vector3.one;
 
         LayoutRebuilder.ForceRebuildLayoutImmediate(content.GetComponent<RectTransform>());
     }
