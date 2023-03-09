@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -13,8 +14,6 @@ public class ListOptmizer : MonoBehaviour
     [SerializeField] private GameObject ItemTemplate;
     [Header("Scrollbar")]
     private ScrollRect scrollRect;
-    private Scrollbar scrollbarVertical;
-    private Scrollbar scrollbarHorizintal;
     private RectTransform content;
     #endregion
 
@@ -63,14 +62,6 @@ public class ListOptmizer : MonoBehaviour
         {
             scrollRect = GetComponent<ScrollRect>();
         }
-        if (scrollbarVertical == null)
-        {
-            scrollbarVertical = scrollRect.verticalScrollbar;
-        }
-        if (scrollbarHorizintal == null)
-        {
-            scrollbarHorizintal = scrollRect.horizontalScrollbar;
-        }
         if (content == null)
         {
             content = scrollRect.content;
@@ -80,10 +71,10 @@ public class ListOptmizer : MonoBehaviour
             Debug.LogError("ItemTemplate is null");
             return;
         }
-        if (scrollbarHorizintal != null)
-            scrollbarHorizintal.onValueChanged.AddListener(OnScrollValueChanged);
-        if (scrollbarVertical != null)
-            scrollbarVertical.onValueChanged.AddListener(OnScrollValueChanged);
+        if (scrollRect.horizontal)
+            scrollRect.onValueChanged.AddListener((v) => { OnScrollValueChanged(1-v.x); });
+        else if (scrollRect.vertical)
+            scrollRect.onValueChanged.AddListener((v) => { OnScrollValueChanged(v.y); });
     }
 
     /// <summary>
@@ -112,30 +103,36 @@ public class ListOptmizer : MonoBehaviour
     public void PopulateList(int itemsNumber, Action<int, GameObject> OnItemShow = null, Action<int, GameObject> OnItemHide = null)
     {
         ItemTemplate.gameObject.SetActive(true);
-        Z.InvokeEndOfFrame(() =>
-        {
-            isHorizintal = scrollRect.horizontal;
-            if (isHorizintal && scrollRect.vertical)
-            {
-                Debug.LogError("You can't have both horizontal and vertical enabled\n vertical will be disabled");
-                scrollRect.vertical = false;
-            }
+        StartCoroutine(EnvokeEndOfFrame(() =>
+         {
+             isHorizintal = scrollRect.horizontal;
+             if (isHorizintal && scrollRect.vertical)
+             {
+                 Debug.LogError("You can't have both horizontal and vertical enabled\n vertical will be disabled");
+                 scrollRect.vertical = false;
+             }
 
-            this.totallItemsNumber = itemsNumber;
-            this.OnItemShow = OnItemShow;
-            this.OnItemHide = OnItemHide;
-            ClearOldItems();
-            CalculateMeasures();
-            CreateVisibleItems();
-            CreateFillers();
-            startIndex = 0;
-            oldStartIndex = -1;
-            endIndex = VisibleItemsNumber - 1;
-            ResizeFillers();
-            ExcuteOnItemShowAction();
-            isPopulated = true;
-            ItemTemplate.gameObject.SetActive(false);
-        });
+             this.totallItemsNumber = itemsNumber;
+             this.OnItemShow = OnItemShow;
+             this.OnItemHide = OnItemHide;
+             ClearOldItems();
+             CalculateMeasures();
+             CreateVisibleItems();
+             CreateFillers();
+             startIndex = 0;
+             oldStartIndex = -1;
+             endIndex = VisibleItemsNumber - 1;
+             ResizeFillers();
+             ExcuteOnItemShowAction();
+             isPopulated = true;
+             ItemTemplate.gameObject.SetActive(false);
+         }));
+    }
+
+    IEnumerator EnvokeEndOfFrame(Action action)
+    {
+        yield return new WaitForEndOfFrame();
+        action?.Invoke();
     }
 
     /// <summary>
